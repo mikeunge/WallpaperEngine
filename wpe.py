@@ -62,9 +62,6 @@ def kill_gif_if_running(pidfile: str):
 # @params   wallpaper   -> full path to the wallpaper
 #           gif         -> if it's a gif, render it?
 def set_wallpaper(wallpaper: str, gif: bool):
-    if DEBUG:
-        # if we are in debug mode, we don't want to trigger a 'set_wallpaper' event
-        return
     # if wallpaper has whitespaces, make it linux (feh) friendly
     wallpaper = wallpaper.replace(" ", "\\ ")
     pidfile = '/tmp/back4.pid'
@@ -194,6 +191,7 @@ def render(wp_gif: str, gif_allowed: bool) -> bool:
 #
 # @params   config  -> config dict
 def main(conf: dict):
+    #TODO de-clutter this mess of a function
     conf['wp_path'] = serialize_path(conf['wp_path'])
     conf['remember_path'] = serialize_path(conf['remember_path'])
     wallpapers = get_wallpapers(conf['wp_path'], tuple(conf['extensions']))
@@ -214,6 +212,8 @@ def main(conf: dict):
         conf['wp'] = choice(conf['wp'])
     if not path.isfile(conf['wp']):  # check if wp is already a valid path
         wp = path.join(conf['wp_path'], conf['wp'])
+    else:
+        wp = conf['wp']
     # check if the desired wallpaper is in the returned list
     if wp in wallpapers:
         gif = render(wp, conf['render_gif'])
