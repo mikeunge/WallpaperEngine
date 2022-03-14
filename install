@@ -15,7 +15,7 @@ fi
 if [ "$1" == "--gif" ]; then
     if [ -f "include/foo-Wallpaper-Feh-Gif/back4.sh" ]; then
         printf "Installing back4 ... "
-        chmod +x include/foo-Wallpaper-Feh-Gif/back4.sh 
+        chmod +x include/foo-Wallpaper-Feh-Gif/back4.sh
         cp include/foo-Wallpaper-Feh-Gif/back4.sh /usr/bin/back4
         if [ "$?" -eq 0 ]; then
             printf "done\n"
