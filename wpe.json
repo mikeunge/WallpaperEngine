@@ -1,0 +1,19 @@
+{
+    "wp_path": "~/Pictures/Wallpaper/",
+    "wp": [
+        "wp1.jpg",
+        "wp2.jpg",
+        "wp3.jpg"
+    ],
+    "random": true,
+    "remember": 10,
+    "remember_path": "~/.wpe_store",
+    "render_gif": true,
+    "extensions": [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+        ".gif"
+    ]
+}
