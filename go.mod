@@ -1,4 +1,4 @@
-module github.com/mikeunge/Scripts/wallpaper-engine
+module github.com/mikeunge/WallpaperEngine
 
 go 1.20
 

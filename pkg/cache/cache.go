@@ -5,8 +5,8 @@ import (
     "fmt"
 	"strings"
 
-	"github.com/mikeunge/Scripts/wallpaper-engine/pkg/helpers"
-	log "github.com/mikeunge/Scripts/wallpaper-engine/pkg/logger"
+	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
+	log "github.com/mikeunge/WallpaperEngine/pkg/logger"
 )
 
 func Find(path string, hash string, size int) bool {

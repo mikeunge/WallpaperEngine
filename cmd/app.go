@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mikeunge/Scripts/wallpaper-engine/internal/cli"
-	"github.com/mikeunge/Scripts/wallpaper-engine/internal/config"
-	"github.com/mikeunge/Scripts/wallpaper-engine/pkg/cache"
-	"github.com/mikeunge/Scripts/wallpaper-engine/pkg/helpers"
-	log "github.com/mikeunge/Scripts/wallpaper-engine/pkg/logger"
+	"github.com/mikeunge/WallpaperEngine/internal/cli"
+	"github.com/mikeunge/WallpaperEngine/internal/config"
+	"github.com/mikeunge/WallpaperEngine/internal/wallpaper"
+	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
+	log "github.com/mikeunge/WallpaperEngine/pkg/logger"
 )
 
 const (
@@ -19,7 +19,7 @@ const (
 )
 
 var (
-    configPath = "~/.config/wallpaper-engine/config.json"
+    configPath = "~/.config/WallpaperEngine/config.json"
 )
 
 func init() {
@@ -46,37 +46,10 @@ func init() {
     configPath = helpers.SanitizePath(configPath)
 }
 
-func sanitizeConfigPaths(appConfig *config.Config) {
+func sanitizePaths(appConfig *config.Config) {
     appConfig.WallpaperPath = helpers.SanitizePath(appConfig.WallpaperPath)
     appConfig.Remember.RememberPath = helpers.SanitizePath(appConfig.Remember.RememberPath)
 }
-
-func getWallpaper(appConfig *config.Config) (string, error) {
-    files, err := helpers.GetFilesInDir(appConfig.WallpaperPath)
-    if err != nil {
-        log.Error("%+v", err)
-        return "", err
-    }
-
-    images, err := helpers.FilterImages(files, appConfig.ValidExtensions)
-    if err != nil {
-        log.Error("%+v", err)
-        return "", err
-    }
-
-    // we don't remember the last images, so fuck them
-    if !appConfig.Remember.RememberSetWallpapers {
-        return helpers.GetRandomImage(images), nil
-    }
-
-    image := helpers.GetRandomImage(images)
-    log.Debug("Selected image: %s", image)
-    fileHash := helpers.CreateHash(image)
-    cache.Find(appConfig.Remember.RememberPath, fileHash, appConfig.Remember.MaxRotations)
-
-    return "", nil
-}
-
 
 
 func App() error {
@@ -86,9 +59,9 @@ func App() error {
         log.Warn("Using default config as fallback!")
 		appConfig = config.DefaultConfig()
 	}
-    sanitizeConfigPaths(&appConfig)
+    sanitizePaths(&appConfig)
 
-    wallpaper, err := getWallpaper(&appConfig)
+    wallpaper, err := wallpaper.GetWallpaper(&appConfig)
     if err != nil {
         return err
     }

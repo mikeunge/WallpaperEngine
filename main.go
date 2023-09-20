@@ -4,7 +4,7 @@ import (
     "os"
 	"fmt"
 
-	"github.com/mikeunge/Scripts/wallpaper-engine/cmd"
+	"github.com/mikeunge/WallpaperEngine/cmd"
 )
 
 func main() {

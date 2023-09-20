@@ -3,9 +3,8 @@ package helpers
 import (
     "fmt"
     "strings"
-    "math/rand"
 
-    log "github.com/mikeunge/Scripts/wallpaper-engine/pkg/logger"
+    log "github.com/mikeunge/WallpaperEngine/pkg/logger"
 )
 
 func FilterImages(imagePaths []string, validExtensions []string) ([]string, error) {
@@ -27,9 +26,5 @@ func FilterImages(imagePaths []string, validExtensions []string) ([]string, erro
     }
 
     return filteredImages, nil
-}
-
-func GetRandomImage(imagePaths []string) string {
-    return imagePaths[rand.Intn(len(imagePaths))]
 }
 
