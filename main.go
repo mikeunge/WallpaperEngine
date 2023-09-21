@@ -1,17 +1,11 @@
 package main
 
 import (
-    "os"
-	"fmt"
+	"os"
 
 	"github.com/mikeunge/WallpaperEngine/cmd"
 )
 
 func main() {
-    err := cmd.App()
-    if err != nil {
-        fmt.Printf("Wallpaper-Engine exited with error %+v\n", err)
-        os.Exit(1)
-    }
-    os.Exit(0)
+	os.Exit(cmd.App())
 }

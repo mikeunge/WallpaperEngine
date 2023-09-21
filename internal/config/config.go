@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-    "github.com/mikeunge/WallpaperEngine/pkg/helpers"
+	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
 )
 
 type IRemember struct {
