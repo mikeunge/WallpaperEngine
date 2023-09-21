@@ -9,7 +9,7 @@ import (
 
 var (
 	log         *logrus.Logger
-	logFilePath = "wallpaper-engine.log"
+	logFilePath = "/tmp/wallpaper-engine.log"
 )
 
 func SetLogLevel(level string) {

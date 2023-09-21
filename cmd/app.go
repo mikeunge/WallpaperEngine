@@ -15,12 +15,12 @@ import (
 const (
 	AppName        = "Wallpaper-Engine"
 	AppDescription = "A simple wallpaper setter."
-	AppVersion     = "0.1"
+	AppVersion     = "1.0.0"
 	AppAuthor      = "@mikeunge"
 )
 
 var (
-	configPath = "~/.config/WallpaperEngine/config.json"
+	configPath = "~/.config/wallpaper-engine/config.json"
 )
 
 func init() {

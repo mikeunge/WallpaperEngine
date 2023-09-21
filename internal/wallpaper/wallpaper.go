@@ -24,6 +24,9 @@ func GetWallpaper(appConfig *config.Config) (string, error) {
 
 	if !appConfig.Remember.RememberSetWallpapers {
 		return getRandomImage(images), nil
+	} else if !appConfig.RandomWallpaper && len(appConfig.Wallpapers) <= 0 {
+		log.Warn("Choosing random image because no wallpapers are defined!")
+		return getRandomImage(images), nil
 	} else if appConfig.Remember.MaxRotations >= len(images) {
 		log.Warn("Choosing random image because store size is bigger than all the available images, to fix this adapt your config!")
 		return getRandomImage(images), nil
