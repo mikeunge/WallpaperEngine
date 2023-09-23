@@ -27,3 +27,14 @@ func FilterImages(imagePaths []string, validExtensions []string) ([]string, erro
 
 	return filteredImages, nil
 }
+
+func FindImageInImages(image string, images []string) (string, error) {
+	for i := 0; i <= len(images); i++ {
+		filename := GetFileName(images[i])
+		if filename == image {
+			return images[i], nil
+		}
+	}
+
+	return "", fmt.Errorf("Could not find image, %s", image)
+}
