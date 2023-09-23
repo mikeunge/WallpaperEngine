@@ -27,7 +27,7 @@ func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
 		return "", err
 	}
 
-	images, err := helpers.FilterImages(files, appConfig.ValidExtensions)
+	images, err := helpers.FilterImages(files, appConfig.ValidExtensions, appConfig.Blacklist)
 	if err != nil {
 		log.Error("%+v", err)
 		return "", err
@@ -40,6 +40,7 @@ func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
 			log.Info("Returning random image")
 			return getRandomImage(images), nil
 		}
+
 		log.Debug("Found image! %s", image)
 		return image, nil
 	} else if !appConfig.Remember.RememberSetWallpapers {
