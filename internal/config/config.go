@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
 )
@@ -18,6 +17,7 @@ type Config struct {
 	Engine          string    `json:"engine"`
 	WallpaperPath   string    `json:"wallpaper_path"`
 	Wallpapers      []string  `json:"wallpapers"`
+	Blacklist       []string  `json:"blacklist"`
 	RandomWallpaper bool      `json:"random_wallpaper"`
 	Remember        IRemember `json:"remember"`
 	ValidExtensions []string  `json:"valid_extensions"`
@@ -31,7 +31,7 @@ func Parse(configPath string) (Config, error) {
 		return config, fmt.Errorf("config not found: %s", configPath)
 	}
 
-	data, err := ioutil.ReadFile(configPath)
+	data, err := helpers.ReadFile(configPath)
 	if err != nil {
 		return config, fmt.Errorf("could not read config: %+v", err)
 	}
@@ -49,6 +49,7 @@ func DefaultConfig() Config {
 		Engine:          "gnome",
 		WallpaperPath:   "~/Pictures/",
 		Wallpapers:      []string{},
+		Blacklist:       []string{},
 		RandomWallpaper: true,
 		Remember: IRemember{
 			RememberSetWallpapers: true,

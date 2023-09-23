@@ -39,7 +39,12 @@ func PathExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
+
 	return true
+}
+
+func GetFileName(path string) string {
+    return strings.Split(path, "/")[len(strings.Split(path, "/")) - 1]
 }
 
 func GetFilesInDir(path string) ([]string, error) {
@@ -78,5 +83,7 @@ func ReadFile(path string) ([]byte, error) {
 	if err != nil {
         return []byte{}, fmt.Errorf("Cannot read data from file %s, %+v", path, err)
 	}
+
 	return data, nil
 }
+

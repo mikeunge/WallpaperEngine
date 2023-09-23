@@ -45,7 +45,7 @@ func New(app AppInfo) (Args, error) {
 
 	if *currentWallpaper {
         if !helpers.FileExists(app.WallpaperPath) {
-            fmt.Printf("Wallpaper path does not exist: %s\n", app.WallpaperPath)
+            fmt.Printf("Wallpaper does not exist: %s\n", app.WallpaperPath)
             os.Exit(1)
         }
 
