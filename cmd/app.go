@@ -15,7 +15,7 @@ import (
 const (
 	AppName        = "Wallpaper-Engine"
 	AppDescription = "A simple wallpaper setter."
-	AppVersion     = "1.0.0"
+	AppVersion     = "1.0.1"
 	AppAuthor      = "@mikeunge"
 )
 
