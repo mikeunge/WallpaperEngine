@@ -68,3 +68,15 @@ func CreateHash(str string) string {
 	hash.Write([]byte(str))
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
+
+func WriteToFile(path string, data string) error {
+	return os.WriteFile(path, []byte(data), 0644)
+}
+
+func ReadFile(path string) ([]byte, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+        return []byte{}, fmt.Errorf("Cannot read data from file %s, %+v", path, err)
+	}
+	return data, nil
+}

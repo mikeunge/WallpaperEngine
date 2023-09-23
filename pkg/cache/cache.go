@@ -2,7 +2,6 @@ package cache
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
@@ -15,13 +14,14 @@ func Find(path string, hash string, size int) bool {
 		return false
 	}
 
-	data, err := read(path)
+	data, err := helpers.ReadFile(path)
 	if err != nil {
 		log.Error("Cannot read from cache file, %s", path)
 		return false
 	}
 
-	for _, elem := range data {
+    cacheData := strings.Split(string(data), ";")
+	for _, elem := range cacheData {
 		if elem == hash {
 			log.Debug("Found wallpaper in cache - hash: %s", hash)
 			return true
@@ -40,34 +40,23 @@ func Find(path string, hash string, size int) bool {
 func update(path string, hash string, size int) error {
 	if !helpers.FileExists(path) {
 		log.Warn("Cache file does not exist, %s, trying to create it", path)
-		write(path, hash)
+		helpers.WriteToFile(path, hash)
 		return nil
 	}
 
-	cache, err := read(path)
+	data, err := helpers.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("Cannot read from cache file, %s", path)
 	}
 
+    cache := strings.Split(string(data), ";")
 	if len(cache) >= size {
 		cache = pop(cache)
 	}
 
 	cache = append(cache, hash)
-	write(path, strings.Join(cache, ";"))
+	helpers.WriteToFile(path, strings.Join(cache, ";"))
 	return nil
-}
-
-func read(path string) ([]string, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return []string{}, fmt.Errorf("Cannot read cache from %s, %+v", path, err)
-	}
-	return strings.Split(string(data), ";"), nil
-}
-
-func write(path string, data string) error {
-	return os.WriteFile(path, []byte(data), 0644)
 }
 
 func pop(cache []string) []string {

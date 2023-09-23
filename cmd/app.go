@@ -21,10 +21,13 @@ const (
 
 var (
 	configPath = "~/.config/wallpaper-engine/config.json"
+	currentWallpaperPath = "~/.wpe"
+	wp         string
 )
 
 func init() {
-	appInfo := cli.AppInfo{Name: AppName, Description: AppDescription, Version: AppVersion, Author: AppAuthor}
+    currentWallpaperPath = helpers.SanitizePath(currentWallpaperPath)
+	appInfo := cli.AppInfo{Name: AppName, Description: AppDescription, Version: AppVersion, Author: AppAuthor, WallpaperPath: currentWallpaperPath}
 
 	args, err := cli.New(appInfo)
 	if err != nil {
@@ -44,6 +47,11 @@ func init() {
 		configPath = args.ConfigPath
 	}
 
+	if len(args.Wallpaper) > 0 {
+		log.Info(fmt.Sprintf("Wallpaper was specified, using: %s", args.Wallpaper))
+		wp = args.Wallpaper
+	}
+
 	configPath = helpers.SanitizePath(configPath)
 }
 
@@ -61,23 +69,32 @@ func App() int {
 	}
 	sanitizePaths(&appConfig)
 
-	wallpaper, err := wallpaper.GetWallpaper(&appConfig)
-	if err != nil {
-		return 1
+	// check if wallpaper is set from cli
+	if len(wp) <= 0 {
+		wp, err = wallpaper.GetWallpaper(&appConfig)
+		if err != nil {
+			return 1
+		}
 	}
 
+	// get the engine
 	engine, err := engines.LoadEngine(appConfig.Engine)
 	if err != nil {
 		log.Error("Error while loading engine: %+v", err)
 		return 1
 	}
 
-	engine.SetWallpaperPath(wallpaper)
+	engine.SetWallpaperPath(wp)
 	err = engine.SetWallpaper()
 	if err != nil {
 		log.Error("Something went wrong while setting wallpaper, err: %+v", err)
 		return 1
 	}
 
+    err = helpers.WriteToFile(currentWallpaperPath, wp)
+	if err != nil {
+		log.Error("Could not write current wallpaper to file, err: %+v", err)
+		return 1
+	}
 	return 0
 }

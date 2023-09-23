@@ -1,6 +1,7 @@
 package wallpaper
 
 import (
+    "os"
 	"math/rand"
 
 	"github.com/mikeunge/WallpaperEngine/internal/config"
@@ -33,6 +34,10 @@ func GetWallpaper(appConfig *config.Config) (string, error) {
 	}
 
 	return getImageWithCacheCheck(images, appConfig.Remember.RememberPath, appConfig.Remember.MaxRotations), nil
+}
+
+func SaveCurrentWallpaper(path string, data string) error {
+	return os.WriteFile(path, []byte(data), 0644)
 }
 
 func getRandomImage(imagePaths []string) string {
