@@ -44,14 +44,14 @@ func PathExists(path string) bool {
 }
 
 func GetFileName(path string) string {
-    return strings.Split(path, "/")[len(strings.Split(path, "/")) - 1]
+	return strings.Split(path, "/")[len(strings.Split(path, "/"))-1]
 }
 
 func GetFilesInDir(path string) ([]string, error) {
 	var files []string
 
 	if !PathExists(path) {
-		return files, fmt.Errorf("Path '%s' does not exist", path)
+		return files, fmt.Errorf("path '%s' does not exist", path)
 	}
 
 	// recursivly search for images in provided path
@@ -81,9 +81,8 @@ func WriteToFile(path string, data string) error {
 func ReadFile(path string) ([]byte, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-        return []byte{}, fmt.Errorf("Cannot read data from file %s, %+v", path, err)
+		return []byte{}, fmt.Errorf("cannot read data from file %s, %+v", path, err)
 	}
 
 	return data, nil
 }
-

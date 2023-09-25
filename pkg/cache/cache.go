@@ -20,7 +20,7 @@ func Find(path string, hash string, size int) bool {
 		return false
 	}
 
-    cacheData := strings.Split(string(data), ";")
+	cacheData := strings.Split(string(data), ";")
 	for _, elem := range cacheData {
 		if elem == hash {
 			log.Debug("Found wallpaper in cache - hash: %s", hash)
@@ -46,12 +46,20 @@ func update(path string, hash string, size int) error {
 
 	data, err := helpers.ReadFile(path)
 	if err != nil {
-		return fmt.Errorf("Cannot read from cache file, %s", path)
+		return fmt.Errorf("cannot read from cache file, %s", path)
 	}
 
-    cache := strings.Split(string(data), ";")
-	if len(cache) >= size {
-		cache = pop(cache)
+	cache := strings.Split(string(data), ";")
+	for {
+		// pop elements from store till there is space for the new cache entry
+		// this for loop ensures that the cache is not bigger than the size we defined in the config
+		// because this has led to a bug where wpe ran in a endless loop because all elements where stored in cache
+		// and no image could be applied - so we need to keep the cache after config downsize at the provided size
+		if len(cache) >= size {
+			cache = pop(cache)
+			continue
+		}
+		break
 	}
 
 	cache = append(cache, hash)
