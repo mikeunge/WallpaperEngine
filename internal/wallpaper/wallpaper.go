@@ -10,7 +10,7 @@ import (
 )
 
 func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
-	// Check if wp was provided & check if it exists
+	// Check if wallpaper with full path was provided & check if it the file exists
 	if len(wallpaper) > 0 {
 		if helpers.FileExists(wallpaper) {
 			log.Info("Provided wallpaper was found, %s", wallpaper)

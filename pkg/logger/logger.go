@@ -27,17 +27,24 @@ func SetLogLevel(level string) {
 	}
 }
 
-func init() {
-	file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		panic(fmt.Sprintf("error opening file: %v", err))
-	}
+func SetOutput(fileOut bool) {
+    if fileOut {
+        file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+        if err != nil {
+            panic(fmt.Sprintf("error opening file: %v", err))
+        }
+        log.SetOutput(file)
+    } else {
+        log.SetOutput(os.Stdout)
+    }
+}
 
+func init() {
 	// set up a new json logger, with loglevel warn and write to file
 	log = logrus.New()
 	log.Formatter = &logrus.JSONFormatter{}
-	log.SetLevel(logrus.WarnLevel)
-	log.SetOutput(file)
+	SetLogLevel("warn")
+    SetOutput(true)
 }
 
 func Debug(format string, v ...interface{}) {

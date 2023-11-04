@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 
 	"github.com/mikeunge/WallpaperEngine/internal/cli"
@@ -15,7 +16,7 @@ import (
 const (
 	AppName        = "WallpaperEngine"
 	AppDescription = "A simple wallpaper setter."
-	AppVersion     = "1.0.2"
+	AppVersion     = "1.0.3"
 	AppAuthor      = "@mikeunge"
 )
 
@@ -37,6 +38,7 @@ func init() {
 
 	if args.Debug {
 		log.SetLogLevel("debug")
+		log.SetOutput(false)
 		log.Info("WallpaperEngine running in debug mode")
 	} else if args.Verbose {
 		log.SetLogLevel("info")
@@ -58,6 +60,15 @@ func init() {
 func sanitizePaths(appConfig *config.Config) {
 	appConfig.WallpaperPath = helpers.SanitizePath(appConfig.WallpaperPath)
 	appConfig.Remember.RememberPath = helpers.SanitizePath(appConfig.Remember.RememberPath)
+
+	// if the user has wallpapers specified - clean them ;)
+	if len(appConfig.Wallpapers) > 0 {
+		var cleanWallpapers []string
+		for _, w := range appConfig.Wallpapers {
+			cleanWallpapers = append(cleanWallpapers, helpers.SanitizePath(w))
+		}
+		appConfig.Wallpapers = cleanWallpapers
+	}
 }
 
 func App() int {
@@ -68,6 +79,19 @@ func App() int {
 		appConfig = config.DefaultConfig()
 	}
 	sanitizePaths(&appConfig)
+
+	/**
+	 * Conditions for the wallpapers specified in the config:
+	 *  - Make sure __NO__ wallpaper was set (-s);
+	 *  - If there is at least __ONE__ wallpaper in the wallpapers array;
+	 *  - And if random wallpaper is __NOT__ active;
+	 */
+	if !(len(wp) > 0) && len(appConfig.Wallpapers) > 0 && !appConfig.RandomWallpaper {
+		log.Info("Wallpaper(s) provided - let's choose one")
+		wp = appConfig.Wallpapers[rand.Intn(len(appConfig.Wallpapers))]
+		// set the config to false because we don't remember pre-defined wallpapers
+		appConfig.Remember.RememberSetWallpapers = false
+	}
 
 	wp, err = wallpaper.GetWallpaper(&appConfig, wp)
 	if err != nil {
