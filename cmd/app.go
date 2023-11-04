@@ -15,7 +15,7 @@ import (
 const (
 	AppName        = "WallpaperEngine"
 	AppDescription = "A simple wallpaper setter."
-	AppVersion     = "1.0.2"
+	AppVersion     = "1.0.3"
 	AppAuthor      = "@mikeunge"
 )
 
@@ -37,6 +37,7 @@ func init() {
 
 	if args.Debug {
 		log.SetLogLevel("debug")
+		log.SetOutput(false)
 		log.Info("WallpaperEngine running in debug mode")
 	} else if args.Verbose {
 		log.SetLogLevel("info")
