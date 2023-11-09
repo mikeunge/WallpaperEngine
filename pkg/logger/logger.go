@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
 	"github.com/sirupsen/logrus"
 )
 
 var (
 	log         *logrus.Logger
-	logFilePath = "/tmp/wallpaper-engine.log"
+	logFilePath = "~/.local/share/wallpaper-engine.log"
 )
 
 func SetLogLevel(level string) {
@@ -28,6 +29,7 @@ func SetLogLevel(level string) {
 }
 
 func SetOutput(fileOut bool) {
+    logFilePath = helpers.SanitizePath(logFilePath)
     if fileOut {
         file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
         if err != nil {
