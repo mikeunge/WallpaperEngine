@@ -1,9 +1,10 @@
-package helpers
+package image_helpers
 
 import (
 	"fmt"
 	"strings"
 
+	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
 	log "github.com/mikeunge/WallpaperEngine/pkg/logger"
 )
 
@@ -33,7 +34,7 @@ func FilterImages(imagePaths []string, validExtensions []string, blacklist []str
 
 func FindImageInImages(image string, images []string) (string, error) {
 	for i := 0; i < len(images); i++ {
-		filename := GetFileName(images[i])
+		filename := helpers.GetFileName(images[i])
 		if filename == image {
 			return images[i], nil
 		}
@@ -47,7 +48,7 @@ func isBlacklisted(path string, blacklist []string) bool {
 	for i := 0; i < len(blacklist); i++ {
 		if path == blacklist[i] {
 			return true
-		} else if GetFileName(path) == blacklist[i] {
+		} else if helpers.GetFileName(path) == blacklist[i] {
 			return true
 		}
 	}

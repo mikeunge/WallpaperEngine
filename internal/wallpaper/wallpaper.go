@@ -6,6 +6,7 @@ import (
 	"github.com/mikeunge/WallpaperEngine/internal/config"
 	"github.com/mikeunge/WallpaperEngine/pkg/cache"
 	"github.com/mikeunge/WallpaperEngine/pkg/helpers"
+	"github.com/mikeunge/WallpaperEngine/pkg/image_helpers"
 	log "github.com/mikeunge/WallpaperEngine/pkg/logger"
 )
 
@@ -27,14 +28,14 @@ func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
 		return "", err
 	}
 
-	images, err := helpers.FilterImages(files, appConfig.ValidExtensions, appConfig.Blacklist)
+	images, err := image_helpers.FilterImages(files, appConfig.ValidExtensions, appConfig.Blacklist)
 	if err != nil {
 		log.Error("%+v", err)
 		return "", err
 	}
 
 	if len(wallpaper) > 0 {
-		image, err := helpers.FindImageInImages(wallpaper, images)
+		image, err := image_helpers.FindImageInImages(wallpaper, images)
 		if err != nil {
 			log.Warn("Filtered through all the images but there seems to be no an error: %+v", err)
 			log.Info("Returning random image")
