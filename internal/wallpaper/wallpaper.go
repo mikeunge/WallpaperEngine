@@ -11,6 +11,9 @@ import (
 )
 
 func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
+	// TODO: overthink the implementation of this check and the check below
+	// maybe I can refactor this to make more sense
+
 	// Check if wallpaper with full path was provided & check if it the file exists
 	if len(wallpaper) > 0 {
 		if helpers.FileExists(wallpaper) {
@@ -34,6 +37,7 @@ func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
 		return "", err
 	}
 
+	// TODO: there is no else statement ???
 	if len(wallpaper) > 0 {
 		image, err := image_helpers.FindImageInImages(wallpaper, images)
 		if err != nil {
