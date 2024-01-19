@@ -1,6 +1,7 @@
 package wallpaper
 
 import (
+	"fmt"
 	"math/rand"
 
 	"github.com/mikeunge/WallpaperEngine/internal/config"
@@ -12,49 +13,32 @@ import (
 
 func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
 	// Check if wallpaper with full path was provided & check if it the file exists
-	if len(wallpaper) > 0 {
-		if helpers.FileExists(wallpaper) {
-			log.Info("Provided wallpaper was found, %s", wallpaper)
-			return wallpaper, nil
-		}
-
-		wallpaper = helpers.GetFileName(wallpaper)
-		log.Debug("Retrieved filename: %s", wallpaper)
+	if len(wallpaper) > 0 && helpers.FileExists(wallpaper) {
+		log.Info("Provided wallpaper was found, %s", wallpaper)
+		return wallpaper, nil
 	}
 
-	files, err := helpers.GetFilesInDir(appConfig.WallpaperPath)
+	images, err := getFilteredWallpapers(appConfig)
 	if err != nil {
-		log.Error("%+v", err)
 		return "", err
 	}
 
-	images, err := image_helpers.FilterImages(files, appConfig.ValidExtensions, appConfig.Blacklist)
-	if err != nil {
-		log.Error("%+v", err)
-		return "", err
-	}
-
-	if len(wallpaper) > 0 {
+	// Check if we want to cache the wallpapers or not or we want to choose a random one
+	if appConfig.RandomWallpaper || !appConfig.Remember.RememberSetWallpapers || appConfig.Remember.MaxRotations >= len(images) {
+		log.Info("Choosing random image.")
+		return getRandomImage(images), nil
+	} else if len(wallpaper) > 0 {
 		image, err := image_helpers.FindImageInImages(wallpaper, images)
 		if err != nil {
 			log.Warn("Filtered through all the images but there seems to be no an error: %+v", err)
 			log.Info("Returning random image")
 			return getRandomImage(images), nil
 		}
-
 		log.Debug("Found image! %s", image)
 		return image, nil
-	} else if !appConfig.Remember.RememberSetWallpapers {
-		return getRandomImage(images), nil
-	} else if !appConfig.RandomWallpaper && len(appConfig.Wallpapers) <= 0 {
-		log.Warn("Choosing random image because no wallpapers are defined!")
-		return getRandomImage(images), nil
-	} else if appConfig.Remember.MaxRotations >= len(images) {
-		log.Warn("Choosing random image because store size is bigger than all the available images, to fix this adapt your config!")
-		return getRandomImage(images), nil
+	} else {
+		return getImageWithCacheCheck(images, appConfig.Remember.RememberPath, appConfig.Remember.MaxRotations), nil
 	}
-
-	return getImageWithCacheCheck(images, appConfig.Remember.RememberPath, appConfig.Remember.MaxRotations), nil
 }
 
 func SaveCurrentWallpaper(path string, data string) error {
@@ -63,6 +47,24 @@ func SaveCurrentWallpaper(path string, data string) error {
 
 func getRandomImage(imagePaths []string) string {
 	return imagePaths[rand.Intn(len(imagePaths))]
+}
+
+func getFilteredWallpapers(appConfig *config.Config) ([]string, error) {
+	files, err := helpers.GetFilesInDir(appConfig.WallpaperPath)
+	if err != nil {
+		log.Error("%+v", err)
+		return []string{}, err
+	} else if len(files) == 0 {
+		return []string{}, fmt.Errorf("no files found in %s", appConfig.WallpaperPath)
+	}
+
+	images, err := image_helpers.FilterImages(files, appConfig.ValidExtensions, appConfig.Blacklist)
+	if err != nil {
+		log.Error("%+v", err)
+		return []string{}, err
+	}
+
+	return images, nil
 }
 
 func getImageWithCacheCheck(images []string, rememberPath string, maxRotations int) string {

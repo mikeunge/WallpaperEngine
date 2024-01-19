@@ -1,19 +1,13 @@
 {
-    "engine": "gnome",
-    "random_wallpaper": true,
-    "wallpaper_path": "~/Pictures/Wallpaper/",
-    "wallpapers": [],
-    "blacklist": [],
-    "remember": {
-        "remember_set_wallpapers": true,
-        "max_rotations": 5,
-        "remember_path": "~/.wpe.store"
-    },
-    "valid_extensions": [
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp",
-        ".gif"
-    ]
+  "engine": "gnome",
+  "random_wallpaper": true,
+  "wallpaper_path": "~/Pictures/Wallpaper/",
+  "wallpapers": [],
+  "blacklist": [],
+  "remember": {
+    "remember_set_wallpapers": true,
+    "max_rotations": 5,
+    "remember_path": "~/.wpe.store"
+  },
+  "valid_extensions": [".jpg", ".jpeg", ".png", ".webp", ".gif"]
 }

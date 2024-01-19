@@ -9,24 +9,18 @@ import (
 )
 
 func FilterImages(imagePaths []string, validExtensions []string, blacklist []string) ([]string, error) {
-	if len(validExtensions) == 0 || len(imagePaths) == 0 {
-		return imagePaths, fmt.Errorf("cannot filter images, available images: '%d' - available extensions: '%d'", len(imagePaths), len(validExtensions))
-	}
-
 	var filteredImages []string
-	for i := 0; i < len(imagePaths); i++ {
-		for j := 0; j < len(validExtensions); j++ {
-			if !strings.HasSuffix(imagePaths[i], validExtensions[j]) {
-				log.Debug("Dropping file '%s' - image has no valid extension", imagePaths[i])
-				continue
-			}
-
-			if isBlacklisted(imagePaths[i], blacklist) {
-				log.Info("Dropping image '%s' - image/path is blacklisted", imagePaths[i])
-				continue
-			}
-			filteredImages = append(filteredImages, imagePaths[i])
+	for _, image := range imagePaths {
+		if len(validExtensions) > 0 && !hasValidExtension(image, validExtensions) {
+			log.Debug("Skipping image '%s' - has no valid extensions", image)
+			continue
 		}
+
+		if isBlacklisted(image, blacklist) {
+			log.Info("Skipping image '%s' - image/path is blacklisted", image)
+			continue
+		}
+		filteredImages = append(filteredImages, image)
 	}
 
 	return filteredImages, nil
@@ -43,12 +37,26 @@ func FindImageInImages(image string, images []string) (string, error) {
 	return "", fmt.Errorf("could not find image, %s", image)
 }
 
-func isBlacklisted(path string, blacklist []string) bool {
-	// Check if path is in blacklsit and also check for only image name in blacklist
-	for i := 0; i < len(blacklist); i++ {
-		if path == blacklist[i] {
+func hasValidExtension(image string, extensions []string) bool {
+	if len(extensions) == 0 {
+		return true
+	}
+
+	for _, extension := range extensions {
+		if strings.HasSuffix(image, extension) {
 			return true
-		} else if helpers.GetFileName(path) == blacklist[i] {
+		}
+	}
+	return false
+}
+
+func isBlacklisted(path string, blacklist []string) bool {
+	if len(blacklist) == 0 {
+		return false
+	}
+
+	for i := 0; i < len(blacklist); i++ {
+		if path == blacklist[i] || helpers.GetFileName(path) == blacklist[i] {
 			return true
 		}
 	}
