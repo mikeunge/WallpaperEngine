@@ -17,14 +17,15 @@ func FilterImages(imagePaths []string, validExtensions []string, blacklist []str
 	for i := 0; i < len(imagePaths); i++ {
 		for j := 0; j < len(validExtensions); j++ {
 			if !strings.HasSuffix(imagePaths[i], validExtensions[j]) {
-				log.Debug("Dropping file '%s' - image has no valid extension", imagePaths[i])
+				log.Debug("Skipping image '%s' - extension '%s' does not match", imagePaths[i], validExtensions[j])
 				continue
 			}
 
 			if isBlacklisted(imagePaths[i], blacklist) {
-				log.Info("Dropping image '%s' - image/path is blacklisted", imagePaths[i])
+				log.Info("Skipping image '%s' - image/path is blacklisted", imagePaths[i])
 				continue
 			}
+
 			filteredImages = append(filteredImages, imagePaths[i])
 		}
 	}
