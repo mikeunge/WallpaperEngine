@@ -16,46 +16,9 @@ import (
 const (
 	AppName        = "WallpaperEngine"
 	AppDescription = "A simple wallpaper setter."
-	AppVersion     = "1.0.4"
+	AppVersion     = "1.0.5"
 	AppAuthor      = "@mikeunge"
 )
-
-var (
-	configPath           = "~/.config/wallpaper-engine/config.json"
-	currentWallpaperPath = "~/.wpe"
-	wp                   string
-)
-
-func init() {
-	currentWallpaperPath = helpers.SanitizePath(currentWallpaperPath)
-	appInfo := cli.AppInfo{Name: AppName, Description: AppDescription, Version: AppVersion, Author: AppAuthor, WallpaperPath: currentWallpaperPath}
-
-	args, err := cli.New(appInfo)
-	if err != nil {
-		fmt.Printf("%+v", err)
-		os.Exit(0)
-	}
-
-	if args.Debug {
-		log.SetLogLevel("debug")
-		log.SetOutput(false)
-		log.Info("WallpaperEngine running in debug mode")
-	} else if args.Verbose {
-		log.SetLogLevel("info")
-	}
-
-	if len(args.ConfigPath) > 0 {
-		log.Info(fmt.Sprintf("Config path changed '%s' to '%s'", configPath, args.ConfigPath))
-		configPath = args.ConfigPath
-	}
-
-	if len(args.Wallpaper) > 0 {
-		log.Info(fmt.Sprintf("Wallpaper was specified, using: %s", args.Wallpaper))
-		wp = args.Wallpaper
-	}
-
-	configPath = helpers.SanitizePath(configPath)
-}
 
 func sanitizePaths(appConfig *config.Config) {
 	appConfig.WallpaperPath = helpers.SanitizePath(appConfig.WallpaperPath)
@@ -72,6 +35,32 @@ func sanitizePaths(appConfig *config.Config) {
 }
 
 func App() int {
+	var selectedWallpaper string
+
+	configPath := helpers.SanitizePath("~/.config/wallpaper_engine/config.json")
+	currentWallpaperPath := helpers.SanitizePath("~/.wpe")
+	cliArgs, err := cli.New(cli.AppInfo{Name: AppName, Description: AppDescription, Version: AppVersion, Author: AppAuthor, WallpaperPath: currentWallpaperPath})
+	if err != nil {
+		fmt.Printf("%+v", err)
+		os.Exit(0)
+	}
+
+	if cliArgs.Debug {
+		log.SetLogLevel("debug")
+		log.SetOutput(false)
+		log.Info("WallpaperEngine running in debug mode")
+	}
+
+	if len(cliArgs.ConfigPath) > 0 {
+		log.Info(fmt.Sprintf("Config path changed '%s' to '%s'", configPath, cliArgs.ConfigPath))
+		configPath = cliArgs.ConfigPath
+	}
+
+	if len(cliArgs.Wallpaper) > 0 {
+		log.Info(fmt.Sprintf("Wallpaper was specified, using: %s", cliArgs.Wallpaper))
+		selectedWallpaper = cliArgs.Wallpaper
+	}
+
 	appConfig, err := config.Parse(configPath)
 	if err != nil {
 		log.Error("Config parser returned an error, '%+v'", err)
@@ -80,20 +69,27 @@ func App() int {
 	}
 	sanitizePaths(&appConfig)
 
+	if cliArgs.ResetCache {
+		log.Warn("Resetting cache (%s)", appConfig.Remember.RememberPath)
+		if err = helpers.WriteToFile(appConfig.Remember.RememberPath, ""); err != nil {
+			fmt.Printf("Could not reset cache: %s\n%+v\n", appConfig.Remember.RememberPath, err)
+		}
+	}
+
 	/**
 	 * Conditions for the wallpapers specified in the config:
 	 *  - Make sure __NO__ wallpaper was set (-s);
 	 *  - If there is at least __ONE__ wallpaper in the wallpapers array;
 	 *  - And if random wallpaper is __NOT__ active;
 	 */
-	if !(len(wp) > 0) && len(appConfig.Wallpapers) > 0 && !appConfig.RandomWallpaper {
+	if !(len(selectedWallpaper) > 0) && len(appConfig.Wallpapers) > 0 && !appConfig.RandomWallpaper {
 		log.Info("Wallpaper(s) provided - let's choose one")
-		wp = appConfig.Wallpapers[rand.Intn(len(appConfig.Wallpapers))]
+		selectedWallpaper = appConfig.Wallpapers[rand.Intn(len(appConfig.Wallpapers))]
 		// set the config to false because we don't remember pre-defined wallpapers
 		appConfig.Remember.RememberSetWallpapers = false
 	}
 
-	wp, err = wallpaper.GetWallpaper(&appConfig, wp)
+	selectedWallpaper, err = wallpaper.GetWallpaper(&appConfig, selectedWallpaper)
 	if err != nil {
 		return 1
 	}
@@ -105,7 +101,7 @@ func App() int {
 		return 1
 	}
 
-	engine.SetWallpaperPath(wp)
+	engine.SetWallpaperPath(selectedWallpaper)
 	err = engine.SetWallpaper()
 	if err != nil {
 		log.Error("Something went wrong while setting wallpaper, err: %+v", err)
@@ -113,10 +109,11 @@ func App() int {
 	}
 
 	// safe current wallpaper to tmp file
-	err = wallpaper.SaveCurrentWallpaper(currentWallpaperPath, wp)
+	err = wallpaper.SaveCurrentWallpaper(currentWallpaperPath, selectedWallpaper)
 	if err != nil {
 		log.Error("Could not write current wallpaper to file, err: %+v", err)
 		return 1
 	}
+
 	return 0
 }
