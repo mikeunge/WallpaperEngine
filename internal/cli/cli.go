@@ -14,13 +14,14 @@ type AppInfo struct {
 	Version       string
 	Author        string
 	WallpaperPath string
+	CachePath     string
 }
 
 type Args struct {
 	ConfigPath string
 	Debug      bool
-	Verbose    bool
 	Wallpaper  string
+	ResetCache bool
 }
 
 func New(app AppInfo) (Args, error) {
@@ -28,7 +29,7 @@ func New(app AppInfo) (Args, error) {
 
 	version := parser.Flag("v", "version", &argparse.Options{Required: false, Help: "Prints the version"})
 	debug := parser.Flag("d", "debug", &argparse.Options{Required: false, Help: "Enable debug logging"})
-	verbose := parser.Flag("r", "verbose", &argparse.Options{Required: false, Help: "Logs more (verbose) information"})
+	resetCache := parser.Flag("r", "reset", &argparse.Options{Required: false, Help: "Reset/Clear the wpe (cache) store"})
 	config := parser.String("c", "config", &argparse.Options{Required: false, Help: "Specify the configuration path"})
 	wallpaper := parser.String("s", "set-wallpaper", &argparse.Options{Required: false, Help: "Specify a wallpaper that should get set"})
 	currentWallpaper := parser.Flag("g", "get-wallpaper", &argparse.Options{Required: false, Help: "Get the current wallpaper"})
@@ -44,27 +45,19 @@ func New(app AppInfo) (Args, error) {
 	}
 
 	if *currentWallpaper {
-        if !helpers.FileExists(app.WallpaperPath) {
-            fmt.Printf("Could not get current wallpaper, file does not exist: %s\n", app.WallpaperPath)
-            os.Exit(1)
-        }
+		if !helpers.FileExists(app.WallpaperPath) {
+			fmt.Printf("Could not get current wallpaper, file does not exist: %s\n", app.WallpaperPath)
+			os.Exit(1)
+		}
 
-        data, err := helpers.ReadFile(app.WallpaperPath)
-        if err != nil {
-            fmt.Printf("Could not read data: %+v\n", err)
-            os.Exit(1)
-        }
-        fmt.Printf("Current wallpaper: %s\n", string(data))
+		data, err := helpers.ReadFile(app.WallpaperPath)
+		if err != nil {
+			fmt.Printf("Could not read data: %+v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Current wallpaper: %s\n", string(data))
 		os.Exit(0)
 	}
 
-	var args = Args{ConfigPath: *config, Debug: false, Verbose: false, Wallpaper: *wallpaper}
-	if *debug {
-		args.Debug = true
-	}
-
-	if *verbose && !*debug {
-		args.Verbose = true
-	}
-	return args, nil
+	return Args{ConfigPath: *config, Debug: *debug, Wallpaper: *wallpaper, ResetCache: *resetCache}, nil
 }
