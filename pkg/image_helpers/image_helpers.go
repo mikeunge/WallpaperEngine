@@ -27,13 +27,25 @@ func FilterImages(imagePaths []string, validExtensions []string, blacklist []str
 }
 
 func FindImageInImages(image string, images []string) (string, error) {
-	for i := 0; i < len(images); i++ {
-		filename := helpers.GetFileName(images[i])
-		if filename == image {
-			return images[i], nil
-		}
+	hasExtension := true
+	if len(strings.Split(image, ".")) == 1 {
+		log.Warn("Looking for image WITHOUT provided extension. Be aware that this can lead to unexpected behaviour!")
+		hasExtension = false
 	}
 
+	for _, img := range images {
+		var file string
+
+		if hasExtension {
+			file = helpers.GetFileName(img)
+		} else {
+			file = helpers.GetFileNameWithoutExtension(img)
+		}
+
+		if file == image {
+			return img, nil
+		}
+	}
 	return "", fmt.Errorf("could not find image, %s", image)
 }
 

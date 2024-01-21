@@ -29,16 +29,16 @@ func SetLogLevel(level string) {
 }
 
 func SetOutput(fileOut bool) {
-    logFilePath = helpers.SanitizePath(logFilePath)
-    if fileOut {
-        file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-        if err != nil {
-            panic(fmt.Sprintf("error opening file: %v", err))
-        }
-        log.SetOutput(file)
-    } else {
-        log.SetOutput(os.Stdout)
-    }
+	logFilePath = helpers.SanitizePath(logFilePath)
+	if fileOut {
+		file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			panic(fmt.Sprintf("error opening file: %v", err))
+		}
+		log.SetOutput(file)
+	} else {
+		log.SetOutput(os.Stdout)
+	}
 }
 
 func init() {
@@ -46,7 +46,7 @@ func init() {
 	log = logrus.New()
 	log.Formatter = &logrus.JSONFormatter{}
 	SetLogLevel("warn")
-    SetOutput(true)
+	SetOutput(true)
 }
 
 func Debug(format string, v ...interface{}) {
