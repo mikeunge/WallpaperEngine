@@ -76,6 +76,12 @@ func App() int {
 		}
 	}
 
+	engine, err := engines.LoadEngine(appConfig.Engine)
+	if err != nil {
+		log.Error("Error while loading engine: %+v", err)
+		return 1
+	}
+
 	/**
 	 * Conditions for the wallpapers specified in the config:
 	 *  - Make sure __NO__ wallpaper was set (-s);
@@ -94,23 +100,14 @@ func App() int {
 		return 1
 	}
 
-	// get the engine
-	engine, err := engines.LoadEngine(appConfig.Engine)
-	if err != nil {
-		log.Error("Error while loading engine: %+v", err)
-		return 1
-	}
-
 	engine.SetWallpaperPath(selectedWallpaper)
-	err = engine.SetWallpaper()
-	if err != nil {
+	if err = engine.SetWallpaper(); err != nil {
 		log.Error("Something went wrong while setting wallpaper, err: %+v", err)
 		return 1
 	}
 
 	// safe current wallpaper to tmp file
-	err = wallpaper.SaveCurrentWallpaper(currentWallpaperPath, selectedWallpaper)
-	if err != nil {
+	if err = wallpaper.SaveCurrentWallpaper(currentWallpaperPath, selectedWallpaper); err != nil {
 		log.Error("Could not write current wallpaper to file, err: %+v", err)
 		return 1
 	}
