@@ -12,9 +12,6 @@ import (
 )
 
 func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
-	// TODO: overthink the implementation of this check and the check below
-	// maybe I can refactor this to make more sense
-
 	// Check if wallpaper with full path was provided & check if it the file exists
 	if len(wallpaper) > 0 && helpers.FileExists(wallpaper) {
 		log.Info("Provided wallpaper was found, %s", wallpaper)
@@ -25,7 +22,6 @@ func GetWallpaper(appConfig *config.Config, wallpaper string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 
 	// Check if we want to cache the wallpapers or not or we want to choose a random one
 	if len(wallpaper) > 0 {
