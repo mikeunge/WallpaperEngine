@@ -43,6 +43,10 @@ func PathExists(path string) bool {
 	return true
 }
 
+func GetFileNameWithoutExtension(path string) string {
+	return strings.Split(GetFileName(path), ".")[0]
+}
+
 func GetFileName(path string) string {
 	return strings.Split(path, "/")[len(strings.Split(path, "/"))-1]
 }
