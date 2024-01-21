@@ -10,7 +10,6 @@ import (
 
 func Find(path string, hash string, size int) bool {
 	if !helpers.FileExists(path) {
-		update(path, hash, size)
 		return false
 	}
 
@@ -28,25 +27,25 @@ func Find(path string, hash string, size int) bool {
 		}
 	}
 	log.Debug("Hash not found, creating entry - hash: %s", hash)
-
-	err = update(path, hash, size)
-	if err != nil {
-		log.Error("Error while updating cache file: %s, %+v", path, err)
-		return false
-	}
 	return false
 }
 
-func update(path string, hash string, size int) error {
+func Update(path string, hash string, size int) error {
 	if !helpers.FileExists(path) {
-		log.Warn("Cache file does not exist, %s, trying to create it", path)
-		helpers.WriteToFile(path, hash)
-		return nil
+		log.Warn("Cache does not exist, creating it (%s)", path)
+		if err := helpers.WriteToFile(path, hash); err != nil {
+			return err
+		}
 	}
 
 	data, err := helpers.ReadFile(path)
 	if err != nil {
-		return fmt.Errorf("cannot read from cache file, %s", path)
+		return fmt.Errorf("cannot read from cache: %s\n%+v", path, err)
+	}
+
+	// If first entry, write straight to cache
+	if len(data) == 0 {
+		return helpers.WriteToFile(path, hash)
 	}
 
 	cache := strings.Split(string(data), ";")
@@ -63,8 +62,7 @@ func update(path string, hash string, size int) error {
 	}
 
 	cache = append(cache, hash)
-	helpers.WriteToFile(path, strings.Join(cache, ";"))
-	return nil
+	return helpers.WriteToFile(path, strings.Join(cache, ";"))
 }
 
 func pop(cache []string) []string {
