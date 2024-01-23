@@ -4,7 +4,7 @@ SRC        = main.go
 TARGET     = wpe
 BINS       = $(BUILD_PATH)/$(TARGET)
 INST       = /usr/local/bin
-CONF_DEST  = ~/.config/wallpaper-engine/
+CONF_DEST  = ~/.config/wallpaper_engine/
 CONF       = ./configs/config.json
 
 .PHONY: all clean build run install
