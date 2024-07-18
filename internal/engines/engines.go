@@ -15,7 +15,7 @@ type Engine interface {
 	SetWallpaperPath(string)
 }
 
-func LoadEngine(engineType string) (Engine, error) {
+func EngineFactory(engineType string) (Engine, error) {
 	switch engineType {
 	case "gnome":
 		return &Gnome{}, nil

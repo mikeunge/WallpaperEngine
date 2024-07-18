@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ func sanitizePaths(appConfig *config.Config) {
 	}
 }
 
-func App() int {
+func main() {
 	var selectedWallpaper string
 
 	configPath := helpers.SanitizePath("~/.config/wallpaper_engine/config.json")
@@ -76,10 +76,10 @@ func App() int {
 		}
 	}
 
-	engine, err := engines.LoadEngine(appConfig.Engine)
+	engine, err := engines.EngineFactory(appConfig.Engine)
 	if err != nil {
 		log.Error("Error while loading engine: %+v", err)
-		return 1
+		os.Exit(1)
 	}
 
 	/**
@@ -97,20 +97,19 @@ func App() int {
 
 	selectedWallpaper, err = wallpaper.GetWallpaper(&appConfig, selectedWallpaper)
 	if err != nil {
-		return 1
+		os.Exit(1)
 	}
 
 	engine.SetWallpaperPath(selectedWallpaper)
 	if err = engine.SetWallpaper(); err != nil {
 		log.Error("Something went wrong while setting wallpaper, err: %+v", err)
-		return 1
+		os.Exit(1)
 	}
 
 	// safe current wallpaper to tmp file
 	if err = wallpaper.SaveCurrentWallpaper(currentWallpaperPath, selectedWallpaper); err != nil {
 		log.Error("Could not write current wallpaper to file, err: %+v", err)
-		return 1
+		os.Exit(1)
 	}
-
-	return 0
+	os.Exit(0)
 }

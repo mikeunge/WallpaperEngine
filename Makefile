@@ -1,6 +1,6 @@
 CC         = go
 BUILD_PATH = ./bin
-SRC        = main.go
+SRC        = ./cmd/wallpaper-engine/main.go
 TARGET     = wpe
 BINS       = $(BUILD_PATH)/$(TARGET)
 INST       = /usr/local/bin
