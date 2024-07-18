@@ -2,20 +2,16 @@ package engines
 
 import "fmt"
 
-type Gnome struct {
+type Engine struct {
 	path string
 }
 
-type Feh struct {
-	path string
-}
-
-type Engine interface {
+type EngineImpl interface {
 	SetWallpaper() error
 	SetWallpaperPath(string)
 }
 
-func EngineFactory(engineType string) (Engine, error) {
+func EngineFactory(engineType string) (EngineImpl, error) {
 	switch engineType {
 	case "gnome":
 		return &Gnome{}, nil

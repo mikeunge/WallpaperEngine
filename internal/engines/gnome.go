@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+type Gnome struct {
+	Engine
+}
+
 func getPictureUri() (string, error) {
 	cmd := "gsettings get org.gnome.desktop.interface color-scheme"
 	out, err := exec.Command("bash", "-c", cmd).Output()
@@ -21,12 +25,12 @@ func getPictureUri() (string, error) {
 	return "picture-uri", nil
 }
 
-func (e *Gnome) SetWallpaper() error {
+func (engine *Gnome) SetWallpaper() error {
 	pictureUri, err := getPictureUri()
 	if err != nil {
 		return fmt.Errorf("could not get picture uri (colorschema), %+v", err)
 	}
-	cmd := fmt.Sprintf("gsettings set org.gnome.desktop.background %s file://%s", pictureUri, e.path)
+	cmd := fmt.Sprintf("gsettings set org.gnome.desktop.background %s file://%s", pictureUri, engine.path)
 	_, err = exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return err
@@ -34,6 +38,6 @@ func (e *Gnome) SetWallpaper() error {
 	return nil
 }
 
-func (e *Gnome) SetWallpaperPath(path string) {
-	e.path = path
+func (engine *Gnome) SetWallpaperPath(path string) {
+	engine.path = path
 }
